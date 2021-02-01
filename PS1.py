@@ -46,19 +46,20 @@ def solution2():
   assert 'ekev' in data.keys()
   assert 'nekev' in data.keys()
 
-  with u.set_enabled_equivalencies(u.temperature_energy()):
+  with u.set_enabled_equivalencies(u.spectral()):
     data['ekev'].unit = u.keV
     data['ehz'] = data['ekev'].to(u.Hz)
     data['nekev'].unit = u.cm ** -2 / u.s / u.keV
-    data['Fhz'] = data['ekev'].to(u.ergs) * data['nekev'].to(u.cm ** -2 / u.s / u.Hz)
+    data['Fhz'] = data['ekev'].to(u.erg) * data['nekev'] * (1.0 * u.keV) / (1.0 * u.keV).to(u.Hz)
     D = (100.0 * u.Mpc).to(u.cm)
     R = (1.0 * u.Mpc).to(u.cm)
     data['vLhz'] = 4 * np.pi * D ** 2 * data['Fhz'] * data['ehz']
 
-  plt.plot(data['ehz'], data['vLhz'])
+  ascii.write(data, 'hw1_2.csv', format='csv', overwrite=True)
+  plt.plot(np.log10(data['ehz']), np.log10(data['vLhz']))
   plt.suptitle('Flux density spectrum of Coma Cluster')
-  plt.set_xlabel(r'Frequency $\nu$ [Hz]')
-  plt.set_ylabel(r'Flux density $\nu L_\nu$ [erg/s]')
+  plt.xlabel(r'Frequency $\log(\nu)$ [Hz]')
+  plt.ylabel(r'Flux density $\log(\nu L_\nu)$ [erg/s]')
   plt.savefig('hw1_2.png')
 
 
